@@ -34,16 +34,21 @@ function Show-Notification {
     $Notifier.Show($Toast);
 }
 
-<# Greetings text and requesting user input #>
+<# Starting script #>
 Write-Host "Welcome to Webex AvailaBOT !" -ForegroundColor Green
 $email = Read-Host -Prompt "Enter the user's e-mail you'd like to get a notification when available"
+Write-Host " "
+Write-Host " "
+Write-Host " "
+Write-Host " "
+Write-Host " "
+Write-Host " "
 Write-Host "The entered e-mail is" $email -ForegroundColor Green
 
 <# API call parameters #>
 $Header = @{
     "authorization" = "Bearer $token"
 }
-
 $Parameters = @{
     Method      = "GET"
     Uri         = "https://api.ciscospark.com/v1/people?email=" + $email
@@ -51,34 +56,48 @@ $Parameters = @{
     ContentType = "application/json"
 }
 
-<# Fetching user's current status, first and last name #>
+<# Fetch once Cisco's API to get user's data and current status #>
 $APICall = Invoke-RestMethod @Parameters
 $UserStatus = $APICall.items.status
 $UserFirstName = $APICall.items.firstName
 $UserLastName = $APICall.items.lastName
-
-<# Notifying current status #>
+Write-Host " "
 Write-Host ("Fetching " + $UserFirstName + " " + $UserLastName + "'s status") -ForegroundColor Green
 
-<# If the status is not available, fetch and check it every 10 seconds #>
+<# Fetch Cisco's API each 10 seconds #>
 Do {
+    <# Fetch user's data from Cisco API #>
     $APICall = Invoke-RestMethod @Parameters
     $UserStatus = $APICall.items.status
 
     if ($UserStatus -ne "active") {
-        Write-Host "The user is currently" $APICall.items.status "- Retrying in 10 seconds..." -ForegroundColor Green
-        Start-Sleep -Seconds 10
+        <# Display the user's current status #>
+        Write-Host ($UserFirstName + " " + $UserLastName + " is " + $APICall.items.status) -ForegroundColor Green
+
+        <# Create a progress bar to whow the remaining time before next check #>
+        $seconds = 10
+        1..$seconds |
+        ForEach-Object { $percent = $_ * 100 / $seconds; 
+            Write-Progress -Activity "Fetching" -Status "Next check in $($seconds - $_) seconds..." -PercentComplete $percent;
+            Start-Sleep -Seconds 1
+        }    
     }
 
 } While ($UserStatus -ne "active")
 
-<# Notify that the requested user is online #>
-Write-Host "!!! The user is currently" $APICall.items.status -ForegroundColor Green
+<# Hide progress bar once the user is available #>
+Write-Progress -Completed -Activity "Fetching"
 
-<# Custom text for the Toast notification #>
+<# Preparing the toast notification and closing the script window #>
 $NotificationText = ($UserFirstName + " " + $UserLastName + " est désormais disponible dans Webex !")
+Write-Host ($UserFirstName + " " + $UserLastName + " is currently " + $APICall.items.status) -ForegroundColor Green
 Show-Notification -ToastTitle "Webex availaBOT" -ToastText $NotificationText
 
-<# Automatically close the script windows and notify the user abtout it #>
+<# Create a progress bar to whow the remaining time before closing windows #>
 Write-Host "This window will close automatically in 10 seconds..." -ForegroundColor Green
-Start-Sleep -Seconds 10
+$seconds = 10
+1..$seconds |
+ForEach-Object { $percent = $_ * 100 / $seconds; 
+    Write-Progress -Activity "Closing" -Status "Closing window in $($seconds - $_) seconds..." -PercentComplete $percent;
+    Start-Sleep -Seconds 1
+}  
