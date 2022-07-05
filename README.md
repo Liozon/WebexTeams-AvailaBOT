@@ -8,7 +8,7 @@
 
 ## AvailaBOT in a nutshell
 
-This PowerShell script will notify you when a contact is available in Webex Teams, for a chat of a call.
+This PowerShell script will notify you when a contact is available in Webex Teams, for a chat or call.
 
 ## How to use it
 
