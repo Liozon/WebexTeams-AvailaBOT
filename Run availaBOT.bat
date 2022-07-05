@@ -1,0 +1,1 @@
+ start powershell -command "& '.\WebexAvailability.ps1'"
