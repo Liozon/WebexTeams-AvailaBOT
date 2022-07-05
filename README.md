@@ -12,5 +12,6 @@ This PowerShell script will notify you when a contact is available in Webex Team
 
 Simply double click on  `Run availaBOT.bat` and follow the instructions.
 ![image](images/1.%20Homescreen.png?raw=true "Script launched")
+
 Simply enter the e-mail adress of the colleague or user you want to be notified and press enter. The script will check the user's status every ten second.
 When the user is available, you'll get a Windows notification.
