@@ -1,4 +1,4 @@
-﻿<# Your personnal token from https://developer.webex.com/docs/bots#>
+﻿<# Your personnal token from https://developer.webex.com/docs/bots #>
 $token = "REPLACE_WITH_YOUR_PERSONNAL_TOKEN"
 
 <# Toast notification function #>
