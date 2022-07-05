@@ -2,8 +2,8 @@
 
 - [WebexTeams-AvailaBOT](#webexteams-availabot)
   - [AvailaBOT in a nutshell](#availabot-in-a-nutshell)
-  - [How to use it](#how-to-use-it)
   - [How to set it up](#how-to-set-it-up)
+  - [How to use it](#how-to-use-it)
   - [Launching the script](#launching-the-script)
 
 ---
@@ -13,17 +13,6 @@
 This PowerShell script will notify you when a contact is available in Webex Teams, for a chat or call.
 This script was made, because Cisco, for some reason, doesn't want to include this awesome function, even if it's present in Cisco Jabber.
 This project was inspired by [this AppleScript](https://github.com/CiscoDevNet/webexTeams-ContactAlertWhenAvailable) by [Yossi Meloch](https://github.com/ymeloch).
-
----
-
-## How to use it
-
-Simply double click on  `Run availaBOT.bat` and follow the instructions:
-
-![image](images/1.%20Homescreen.png?raw=true "Script launched")
-
-Simply enter the e-mail adress of the colleague or user you want to be notified and press enter. The script will check the user's status every ten second.
-When the user is available, you'll get a Windows notification.
 
 ---
 
@@ -40,6 +29,17 @@ $token = "REPLACE_WITH_YOUR_PERSONNAL_TOKEN"
 ```
 
 and you're good to go !
+
+---
+
+## How to use it
+
+Simply double click on  `Run availaBOT.bat` and follow the instructions:
+
+![image](images/1.%20Homescreen.png?raw=true "Script launched")
+
+Simply enter the e-mail adress of the colleague or user you want to be notified and press enter. The script will check the user's status every ten second.
+When the user is available, you'll get a Windows notification.
 
 ---
 
