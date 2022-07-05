@@ -45,10 +45,10 @@ When the user is available, you'll get a Windows notification.
 
 ## Launching the script
 
-You can start the script by:
+You can start the script by either:
 
-1. Right-clicking on `WebexAvailability.ps1` and selecting `Execute with PowerShell`
-2. Double clicking on `Run availaBOT.bat` (preferred)
+- Right-clicking on `WebexAvailability.ps1` and selecting `Execute with PowerShell`
+- Double clicking on `Run availaBOT.bat` (preferred)
 
 For the second option, you can even create a shortcut to this file and place it anywhere you want.
 For example, I placed mine in the Start Menu, that way, I can quickly start the script anywhere:
