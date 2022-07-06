@@ -1,6 +1,18 @@
 <# Your personnal token from https://developer.webex.com/docs/bots #>
 $token = "REPLACE_WITH_YOUR_PERSONNAL_TOKEN"
 
+<# Create folder if down't exist #>
+$FolderName = "./fetched-data\"
+if (Test-Path $FolderName) {   
+    Write-Host "Folder exists" -ForegroundColor Cyan
+    Write-Host "Old files were deleted" -ForegroundColor Cyan
+    Get-ChildItem –Path  ./fetched-data/ –Recurse -include *.txt | Where-Object { $_.CreationTime –lt (Get-Date).AddMinutes(-5) } | Remove-Item
+}
+else {  
+    New-Item $FolderName -ItemType Directory
+    Write-Host "Folder created successfully" -ForegroundColor Cyan
+}
+
 <# Generate random ID for temp file naming #>
 $ID = Get-Random -Maximum 100
 
@@ -57,12 +69,12 @@ $Parameters = @{
     Uri         = "https://api.ciscospark.com/v1/people?email=" + $email
     Headers     = $Header
     ContentType = "application/json; charset=utf-8"
-    OutFile     = "./" + $ID + ".txt"
+    OutFile     = "./fetched-data/" + $ID + ".txt"
 }
 
 <# Fetch once Cisco's API to get user's data and current status #>
 Invoke-RestMethod @Parameters
-$data = (Get-Content ./$ID.txt -Encoding UTF8) | ConvertFrom-Json
+$data = (Get-Content ./fetched-data/$ID.txt -Encoding UTF8) | ConvertFrom-Json
 $UserStatus = $data.items.status
 $UserFirstName = $data.items.firstName
 $UserLastName = $data.items.lastName
@@ -73,7 +85,7 @@ Write-Host("Fetching $UserFirstName $UserLastName's status") -ForegroundColor Gr
 Do {
     <# Fetch user's data from Cisco API #>
     Invoke-RestMethod @Parameters
-    $data = (Get-Content ./$ID.txt -Encoding UTF8) | ConvertFrom-Json
+    $data = (Get-Content ./fetched-data/$ID.txt -Encoding UTF8) | ConvertFrom-Json
     $UserStatus = $data.items.status
 
     if ($UserStatus -ne "active") {
@@ -100,7 +112,7 @@ Write-Host ($UserFirstName + " " + $UserLastName + " is currently " + $UserStatu
 Show-Notification -ToastTitle "Webex availaBOT" -ToastText $NotificationText
 
 <# Create a progress bar to whow the remaining time before closing windows #>
-Write-Host "This window will close automatically in 10 seconds..." -ForegroundColor Green
+Write-Host "This window will close automatically in 10 seconds..." -ForegroundColor Cyan
 $seconds = 10
 1..$seconds |
 ForEach-Object { $percent = $_ * 100 / $seconds; 
@@ -108,6 +120,7 @@ ForEach-Object { $percent = $_ * 100 / $seconds;
     Start-Sleep -Seconds 1
 }
 
-<# Cleaning files #>
-Write-Host "Temporary files are being cleaned..." -ForegroundColor Green
-Remove-Item ./$ID.txt 
+<# Cleaning old files #>
+Write-Host "Temporary files are being cleaned..." -ForegroundColor Cyan
+Remove-Item ./fetched-data/$ID.txt 
+Get-ChildItem –Path  ./fetched-data/ –Recurse -include *.txt | Where-Object { $_.CreationTime –lt (Get-Date).AddMinutes(-5) } | Remove-Item
