@@ -66,7 +66,7 @@ $Header = @{
 }
 $Parameters = @{
     Method      = "GET"
-    Uri         = "https://api.ciscospark.com/v1/people?email=" + $email
+    Uri         = "https://webexapis.com/v1/people?email=" + $email
     Headers     = $Header
     ContentType = "application/json; charset=utf-8"
     OutFile     = "./fetched-data/" + $ID + ".txt"
@@ -81,7 +81,7 @@ $UserLastName = $data.items.lastName
 Write-Host " "
 Write-Host("Fetching $UserFirstName $UserLastName's status") -ForegroundColor Green
 
-<# Fetch Cisco's API each 10 seconds #>
+<# Fetch Cisco's API each 30 seconds #>
 Do {
     <# Fetch user's data from Cisco API #>
     Invoke-RestMethod @Parameters
@@ -93,7 +93,7 @@ Do {
         Write-Host($UserFirstName + " " + $UserLastName + " is " + $UserStatus) -ForegroundColor Green
 
         <# Create a progress bar to whow the remaining time before next check #>
-        $seconds = 10
+        $seconds = 30
         1..$seconds |
         ForEach-Object { $percent = $_ * 100 / $seconds; 
             Write-Progress -Activity "Fetching" -Status "Next check in $($seconds - $_) seconds..." -PercentComplete $percent;
