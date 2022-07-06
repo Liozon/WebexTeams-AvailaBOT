@@ -1,5 +1,8 @@
-﻿<# Your personnal token from https://developer.webex.com/docs/bots #>
+<# Your personnal token from https://developer.webex.com/docs/bots #>
 $token = "REPLACE_WITH_YOUR_PERSONNAL_TOKEN"
+
+<# Generate random ID for temp file naming #>
+$ID = Get-Random -Maximum 100
 
 <# Toast notification function #>
 function Show-Notification {
@@ -53,26 +56,29 @@ $Parameters = @{
     Method      = "GET"
     Uri         = "https://api.ciscospark.com/v1/people?email=" + $email
     Headers     = $Header
-    ContentType = "application/json"
+    ContentType = "application/json; charset=utf-8"
+    OutFile     = "./" + $ID + ".txt"
 }
 
 <# Fetch once Cisco's API to get user's data and current status #>
-$APICall = Invoke-RestMethod @Parameters
-$UserStatus = $APICall.items.status
-$UserFirstName = $APICall.items.firstName
-$UserLastName = $APICall.items.lastName
+Invoke-RestMethod @Parameters
+$data = (Get-Content ./$ID.txt -Encoding UTF8) | ConvertFrom-Json
+$UserStatus = $data.items.status
+$UserFirstName = $data.items.firstName
+$UserLastName = $data.items.lastName
 Write-Host " "
-Write-Host ("Fetching " + $UserFirstName + " " + $UserLastName + "'s status") -ForegroundColor Green
+Write-Host("Fetching $UserFirstName $UserLastName's status") -ForegroundColor Green
 
 <# Fetch Cisco's API each 10 seconds #>
 Do {
     <# Fetch user's data from Cisco API #>
-    $APICall = Invoke-RestMethod @Parameters
-    $UserStatus = $APICall.items.status
+    Invoke-RestMethod @Parameters
+    $data = (Get-Content ./$ID.txt -Encoding UTF8) | ConvertFrom-Json
+    $UserStatus = $data.items.status
 
     if ($UserStatus -ne "active") {
         <# Display the user's current status #>
-        Write-Host ($UserFirstName + " " + $UserLastName + " is " + $APICall.items.status) -ForegroundColor Green
+        Write-Host($UserFirstName + " " + $UserLastName + " is " + $UserStatus) -ForegroundColor Green
 
         <# Create a progress bar to whow the remaining time before next check #>
         $seconds = 10
@@ -90,7 +96,7 @@ Write-Progress -Completed -Activity "Fetching"
 
 <# Preparing the toast notification and closing the script window #>
 $NotificationText = ($UserFirstName + " " + $UserLastName + " est désormais disponible dans Webex !")
-Write-Host ($UserFirstName + " " + $UserLastName + " is currently " + $APICall.items.status) -ForegroundColor Green
+Write-Host ($UserFirstName + " " + $UserLastName + " is currently " + $UserStatus) -ForegroundColor Green
 Show-Notification -ToastTitle "Webex availaBOT" -ToastText $NotificationText
 
 <# Create a progress bar to whow the remaining time before closing windows #>
@@ -100,4 +106,8 @@ $seconds = 10
 ForEach-Object { $percent = $_ * 100 / $seconds; 
     Write-Progress -Activity "Closing" -Status "Closing window in $($seconds - $_) seconds..." -PercentComplete $percent;
     Start-Sleep -Seconds 1
-}  
+}
+
+<# Cleaning files #>
+Write-Host "Temporary files are being cleaned..." -ForegroundColor Green
+Remove-Item ./$ID.txt 
