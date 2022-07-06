@@ -5,6 +5,7 @@
   - [How to set it up](#how-to-set-it-up)
   - [How to use it](#how-to-use-it)
   - [Launching the script](#launching-the-script)
+  - [Features to implement](#features-to-implement)
 
 ---
 
@@ -54,3 +55,10 @@ For the second option, you can even create a shortcut to this file and place it 
 For example, I placed mine in the Start Menu, that way, I can quickly start the script anywhere:
 
 ![image](images/Start%20menu.png?raw=true "Start menu")
+
+---
+
+## Features to implement
+
+- [ ] Integrate the URI `webexteams://im?email=firstname.lastname@example.com` to open Webex
+- [ ] Add notification with windows's popup boxes
