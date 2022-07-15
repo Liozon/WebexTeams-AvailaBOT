@@ -25,6 +25,8 @@ function Show-Notification($NotificationText) {
     # Required
     $winTitle = "Webex AvailaBOT"
     $audSource = "ms-winsoundevent:Notification.Looping.Alarm3"
+    [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null
+    $xmlTemplate = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02)
 
     # Toast XML template
     [xml]$xmlTemplate = @"
@@ -43,7 +45,6 @@ function Show-Notification($NotificationText) {
         </group>
     </binding>
     </visual>
-
     <actions>        
         <action content="Ouvrir dans Webex" activationType="protocol" arguments="webexteams://im?email=$($email)" />
         <action content="Plus tard" activationType="protocol" arguments="" />
@@ -53,7 +54,7 @@ function Show-Notification($NotificationText) {
 "@
 
     # Load
-    $xmlToast = New-Object -TypeName Windows.Data.Xml.Dom.XmlDocument
+    $xmlToast = New-Object Windows.Data.Xml.Dom.XmlDocument
     $xmlToast.LoadXml($xmlTemplate.OuterXml)
 
     # Display
