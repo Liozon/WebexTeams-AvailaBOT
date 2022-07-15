@@ -60,5 +60,5 @@ For example, I placed mine in the Start Menu, that way, I can quickly start the 
 
 ## Features to implement
 
-- [ ] Integrate the URI `webexteams://im?email=firstname.lastname@example.com` to open Webex
+- [X] Integrate the URI `webexteams://im?email=firstname.lastname@example.com` to open Webex
 - [ ] Add notification with windows's popup boxes

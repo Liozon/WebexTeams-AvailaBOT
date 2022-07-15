@@ -1,12 +1,15 @@
 <# Your personnal token from https://developer.webex.com/docs/bots #>
 $token = "REPLACE_WITH_YOUR_PERSONNAL_TOKEN"
 
+<# Clear the current windows #>
+Clear-Host
+
 <# Create folder if down't exist #>
 $FolderName = "./fetched-data\"
 if (Test-Path $FolderName) {   
     Write-Host "Folder exists" -ForegroundColor Cyan
     Write-Host "Old files were deleted" -ForegroundColor Cyan
-    Get-ChildItem –Path  ./fetched-data/ –Recurse -include *.txt | Where-Object { $_.CreationTime –lt (Get-Date).AddMinutes(-5) } | Remove-Item
+    Get-ChildItem –Path ./fetched-data/ –Recurse -include *.txt | Where-Object { $_.CreationTime -lt (Get-Date).AddMinutes(-5) } | Remove-Item
 }
 else {  
     New-Item $FolderName -ItemType Directory
@@ -17,36 +20,44 @@ else {
 $ID = Get-Random -Maximum 100
 
 <# Toast notification function #>
-function Show-Notification {
-    [cmdletbinding()]
-    Param (
-        [string]
-        $ToastTitle,
-        [string]
-        [parameter(ValueFromPipeline)]
-        $ToastText
-    )
+function Show-Notification($NotificationText) { 
 
-    [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null
-    $Template = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02)
+    # Required
+    $winTitle = "Webex AvailaBOT"
+    $audSource = "ms-winsoundevent:Notification.Looping.Alarm3"
 
-    $RawXml = [xml] $Template.GetXml()
-    ($RawXml.toast.visual.binding.text | where { $_.id -eq "1" }).AppendChild($RawXml.CreateTextNode($ToastTitle)) > $null
-    ($RawXml.toast.visual.binding.text | where { $_.id -eq "2" }).AppendChild($RawXml.CreateTextNode($ToastText)) > $null
+    # Toast XML template
+    [xml]$xmlTemplate = @"
+<toast scenario="reminder">
+    <visual>
+    <binding template="ToastGeneric" activationType="protocol">
+        <group>
+            <subgroup>
+                <text hint-style="Title" hint-wrap="true" >$winTitle</text>
+            </subgroup>
+        </group>
+        <group>
+            <subgroup>     
+                <text hint-style="Body" hint-wrap="true" >$NotificationText</text>
+            </subgroup>
+        </group>
+    </binding>
+    </visual>
 
-    $SerializedXml = New-Object Windows.Data.Xml.Dom.XmlDocument
-    $SerializedXml.LoadXml($RawXml.OuterXml)
+    <actions>        
+        <action content="Ouvrir dans Webex" activationType="protocol" arguments="webexteams://im?email=$($email)" />
+        <action content="Plus tard" activationType="protocol" arguments="" />
+    </actions>
+    <audio src="$audSource"/>
+</toast>
+"@
 
-    $Toast = [Windows.UI.Notifications.ToastNotification]::new($SerializedXml)
-    $Toast.Tag = "PowerShell"
-    $Toast.Group = "PowerShell"
-    $Toast.Priority = 1
-    $Toast.ExpirationTime = [DateTimeOffset]::Now.AddMinutes(500)
-    $Toast.SuppressPopup = $false
-    $Toast.ExpiresOnReboot = $false
+    # Load
+    $xmlToast = New-Object -TypeName Windows.Data.Xml.Dom.XmlDocument
+    $xmlToast.LoadXml($xmlTemplate.OuterXml)
 
-    $Notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("Webex availaBOT")
-    $Notifier.Show($Toast);
+    # Display
+    [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier(" ").Show($xmlToast)
 }
 
 <# Starting script #>
@@ -109,7 +120,7 @@ Write-Progress -Completed -Activity "Fetching"
 <# Preparing the toast notification and closing the script window #>
 $NotificationText = ($UserFirstName + " " + $UserLastName + " est désormais disponible dans Webex !")
 Write-Host ($UserFirstName + " " + $UserLastName + " is currently " + $UserStatus) -ForegroundColor Green
-Show-Notification -ToastTitle "Webex availaBOT" -ToastText $NotificationText
+Show-Notification $NotificationText
 
 <# Create a progress bar to whow the remaining time before closing windows #>
 Write-Host "This window will close automatically in 10 seconds..." -ForegroundColor Cyan
@@ -123,4 +134,4 @@ ForEach-Object { $percent = $_ * 100 / $seconds;
 <# Cleaning old files #>
 Write-Host "Temporary files are being cleaned..." -ForegroundColor Cyan
 Remove-Item ./fetched-data/$ID.txt 
-Get-ChildItem –Path  ./fetched-data/ –Recurse -include *.txt | Where-Object { $_.CreationTime –lt (Get-Date).AddMinutes(-5) } | Remove-Item
+Get-ChildItem –Path ./fetched-data/ –Recurse -include *.txt | Where-Object { $_.CreationTime -lt (Get-Date).AddMinutes(-5) } | Remove-Item
