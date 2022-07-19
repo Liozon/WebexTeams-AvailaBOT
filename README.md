@@ -2,6 +2,7 @@
 
 - [AvailaBOT - Get notified when a contact is available in Webex Teams](#availabot---get-notified-when-a-contact-is-available-in-webex-teams)
   - [AvailaBOT in a nutshell](#availabot-in-a-nutshell)
+  - [New functionalities](#new-functionalities)
   - [How to set it up](#how-to-set-it-up)
   - [How to use it](#how-to-use-it)
   - [Launching the script](#launching-the-script)
@@ -14,6 +15,15 @@
 This PowerShell script will notify you when a contact is available in Webex Teams, for a chat or call.
 This script was made, because Cisco, for some reason, doesn't want to include this awesome function, even if it's present in Cisco Jabber.
 This project was inspired by [this AppleScript](https://github.com/CiscoDevNet/webexTeams-ContactAlertWhenAvailable) by [Yossi Meloch](https://github.com/ymeloch).
+
+---
+
+## New functionalities
+
+- Better toast notification look
+- When clicked, the notification will open Webex's chat with your selected contact
+- To improve character encoding issues, the API calls are saved in a temp file and deleted once the contact is available
+- Older undeleted temp files (like if you stop the script before the contact is available) are automatically deleted when you start the script again
 
 ---
 
