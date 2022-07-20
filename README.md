@@ -24,6 +24,8 @@ This project was inspired by [this AppleScript](https://github.com/CiscoDevNet/w
 - When clicked, the notification will open Webex's chat with your selected contact
 - To improve character encoding issues, the API calls are saved in a temp file and deleted once the contact is available
 - Older undeleted temp files (like if you stop the script before the contact is available) are automatically deleted when you start the script again
+- Support for non-existing e-mail adresses: the script will check if the user exists. If not, you'll be prompted to re-enter the e-mail
+- Support for API calls errors
 
 ---
 
