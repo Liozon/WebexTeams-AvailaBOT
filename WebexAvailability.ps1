@@ -6,12 +6,16 @@ Clear-Host
 
 <# Gloabl var #>
 $global:email = $null
+$global:heroIMG = Get-ChildItem ./icons/hero.png
+$global:openicon = Get-ChildItem ./icons/open.png
+$global:closeicon = Get-ChildItem ./icons/close.png
+$global:avatar = $null
 
 <# Create folder if down't exist #>
 $FolderName = "./fetched-data\"
 if (Test-Path $FolderName) {   
     Write-Host "Folder exists" -ForegroundColor Cyan
-    Get-ChildItem –Path ./fetched-data/ –Recurse -include *.txt | Where-Object { $_.CreationTime -lt (Get-Date).AddMinutes(-5) } | Remove-Item
+    Get-ChildItem –Path ./fetched-data/ –Recurse -include *.txt, *.png | Where-Object { $_.CreationTime -lt (Get-Date).AddMinutes(-5) } | Remove-Item
     Write-Host "Old files were deleted" -ForegroundColor Cyan
 }
 else {  
@@ -20,7 +24,7 @@ else {
 }
 
 <# Generate random ID for temp file naming #>
-$ID = Get-Random -Maximum 100
+$ID = Get-Random
 
 <# Toast notification function #>
 function Show-Notification($NotificationText) { 
@@ -33,28 +37,31 @@ function Show-Notification($NotificationText) {
 
     # Toast XML template
     [xml]$xmlTemplate = @"
-<toast scenario="reminder">
-    <visual>
-    <binding template="ToastGeneric" activationType="protocol">
-        <group>
-            <subgroup>
-                <text hint-style="Title" hint-wrap="true" >$winTitle</text>
-            </subgroup>
-        </group>
-        <group>
-            <subgroup>     
-                <text hint-style="Body" hint-wrap="true" >$NotificationText</text>
-            </subgroup>
-        </group>
-    </binding>
-    </visual>
-
-    <actions>        
-        <action content="Ouvrir dans Webex" activationType="protocol" arguments="webexteams://im?email=$($global:email)" />
-        <action content="Plus tard" activationType="protocol" arguments="" />
-    </actions>
-    <audio src="$audSource"/>
-</toast>
+    <toast scenario="reminder" useButtonStyle="true">
+        <visual>
+            <text placement="attribution">via $winTitle</text>
+            <binding template="ToastGeneric" activationType="protocol">
+                <image src="$($global:heroIMG)" placement="hero" />
+                <image src="$($global:avatar)" placement="appLogoOverride" hint-crop="circle" />
+                <group>
+                <subgroup>
+                    <text hint-align="left" hint-style="Header">$UserFirstName $UserLastName</text>
+                    <text hint-style="Body" hint-wrap="true">$NotificationText</text>
+                </subgroup>
+                </group>
+                <group>
+                <subgroup>
+                    <text placement="attribution">via $winTitle</text>
+                </subgroup>
+                </group>
+            </binding>
+        </visual>
+        <actions>
+            <action imageUri="$($global:openicon)" hint-toolTip="Text reply" hint-buttonStyle="Success" content="Open Webex" activationType="protocol" arguments="webexteams://im?email=$($global:email)" />
+            <action imageUri="$($global:closeicon)" hint-buttonStyle="Critical" content="Dismiss" activationType="protocol" arguments="" />
+        </actions>
+        <audio src="$audSource" />
+    </toast>
 "@
 
     # Load
@@ -100,7 +107,7 @@ function initialCheck() {
         $UserFirstName = $data.items.firstName
         $UserLastName = $data.items.lastName        
     }
-    catch {
+    catch { 
         Write-Host "An error occured while fetching Webex's API" -ForegroundColor Red
         welcomeText 
     }
@@ -135,7 +142,7 @@ function loopCheck() {
             <# Fetch user's data from Cisco API #>
             Invoke-RestMethod @Parameters
             $data = (Get-Content ./fetched-data/$ID.txt -Encoding UTF8) | ConvertFrom-Json
-            $UserStatus = $data.items.status
+            $UserStatus = $data.items.status            
 
             if ($UserStatus -ne "active") {
                 <# Display the user's current status #>
@@ -158,8 +165,14 @@ function loopCheck() {
     Write-Progress -Completed -Activity "Fetching"
 
     <# Preparing the toast notification and closing the script window #>
-    $NotificationText = ($UserFirstName + " " + $UserLastName + " est désormais disponible dans Webex !")
+    $NotificationText = ("is now available in Webex !")
     Write-Host ($UserFirstName + " " + $UserLastName + " is currently " + $UserStatus) -ForegroundColor Green
+
+    <# Check if the user has an avatar and get it #>
+    if ($data.items.avatar) {
+        Invoke-WebRequest $data.items.avatar -OutFile "./fetched-data/$ID.png"
+        $global:avatar = Get-ChildItem ./fetched-data/$ID.png
+    }
     Show-Notification $NotificationText
     closeScript
 }
@@ -176,7 +189,10 @@ function closeScript() {
 
     <# Cleaning old files #>
     Write-Host "Temporary files are being cleaned..." -ForegroundColor Cyan
-    Remove-Item ./fetched-data/$ID.txt 
+    if ($data.items.avatar) {
+        Remove-Item ./fetched-data/$ID.png
+    }
+    Remove-Item ./fetched-data/$ID.txt
     Get-ChildItem –Path ./fetched-data/ –Recurse -include *.txt | Where-Object { $_.CreationTime -lt (Get-Date).AddMinutes(-5) } | Remove-Item
 }
 
