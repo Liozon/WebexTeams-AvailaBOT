@@ -1,5 +1,7 @@
 # AvailaBOT - Get notified when a contact is available in Webex Teams
 
+![Webex logo](icons/Webex.png)
+
 - [AvailaBOT - Get notified when a contact is available in Webex Teams](#availabot---get-notified-when-a-contact-is-available-in-webex-teams)
   - [Inspiration and credits](#inspiration-and-credits)
   - [New functionalities](#new-functionalities)
