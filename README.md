@@ -3,6 +3,8 @@
 ![Webex logo](icons/Webex.png)
 
 - [AvailaBOT - Get notified when a contact is available in Webex Teams](#availabot---get-notified-when-a-contact-is-available-in-webex-teams)
+  - [Goal](#goal)
+  - [Features](#features)
   - [Inspiration and credits](#inspiration-and-credits)
   - [New functionalities](#new-functionalities)
     - [Recently added](#recently-added)
@@ -11,6 +13,29 @@
   - [How to use it](#how-to-use-it)
   - [Launching the script](#launching-the-script)
   - [Features to implement](#features-to-implement)
+
+---
+
+## Goal
+
+The goal of this script is simply to add the "Alert when available" function from Cisco Jabber to Webex, by displaying a notification when a user is available in Webex:
+
+![Webex notification](images/Notification.png)
+
+Simply enter your coworker or friend's e-mail and let the script do all the work, you won't need to check Webex every 5 minutes to see if your contact is finally available, the script will do it for you and check every 30 seconds if your contact is available.
+
+---
+
+## Features
+
+- Runs in PowerShell (the script should be able to run on most computers in environments without administrator rights)
+- Data refreshes every 30 seconds
+- The script will display the user's avatar (if available) in the notification
+- Multiple instances of this script can run at the same time (to get alerts for multiple contacts)
+- Runs in the background
+- Cleans automatically the temporary files used
+- The script will tell you if you enter a wrong e-mail or a non-existing user e-mail
+- Simple to use: just [generate your Cisco token](https://developer.webex.com/docs/bots) and use the script as many times as you want
 
 ---
 
@@ -27,13 +52,18 @@ This project was inspired by [this AppleScript](https://github.com/CiscoDevNet/w
 ### Recently added
 
 - Improved notification layout, with Webex logo and user avatar (if the user has set one)
+
 ![Notification layout](images/Notification.png)
+
 - Storing the user's avatar with a local temp file
 - Deleting the local avatar after the script ends
 
 ### Previously added
 
 - Better toast notification look
+
+![Improved notification](images/Notification%20improved.png)
+
 - When clicked, the notification will open Webex's chat with your selected contact
 - To improve character encoding issues, the API calls are saved in a temp file and deleted once the contact is available
 - Older undeleted temp files (like if you stop the script before the contact is available) are automatically deleted when you start the script again
