@@ -51,6 +51,8 @@ This project was inspired by [this AppleScript](https://github.com/CiscoDevNet/w
 
 ### Recently added
 
+- Added "Last activity" info in PowerShell terminal. If the user is offline for example, you can know when it was last seen online or the last time Webex was used by the user
+
 - Improved notification layout, with Webex logo and user avatar (if the user has set one)
 
 ![Notification layout](images/Notification.png)
