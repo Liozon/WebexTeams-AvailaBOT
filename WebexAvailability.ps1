@@ -142,11 +142,12 @@ function loopCheck() {
             <# Fetch user's data from Cisco API #>
             Invoke-RestMethod @Parameters
             $data = (Get-Content ./fetched-data/$ID.txt -Encoding UTF8) | ConvertFrom-Json
-            $UserStatus = $data.items.status            
+            $UserStatus = $data.items.status
+            $LastSeen = Get-Date $data.items.lastActivity -UFormat "%A %d %B %Y à %T"      
 
             if ($UserStatus -ne "active") {
                 <# Display the user's current status #>
-                Write-Host($UserFirstName + " " + $UserLastName + " is " + $UserStatus) -ForegroundColor Green
+                Write-Host($UserFirstName + " " + $UserLastName + " is " + $UserStatus + " (last activity: " + $LastSeen + ")") -ForegroundColor Green
 
                 <# Create a progress bar to whow the remaining time before next check #>
                 $seconds = 30
